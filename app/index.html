@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Shadepad</title>
+<meta name="description" content="Hide API keys, emails, phone numbers and card numbers before you paste text into an AI tool.">
+<meta name="theme-color" content="#0f766e">
+<meta name="robots" content="noindex">
+<link rel="icon" href="../icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <a class="brand" href="../" data-t="brand">Shadepad</a>
+  <div class="hdr">
+    <label class="sr" for="lang" data-t="set_lang">Language</label>
+    <select id="lang" aria-label="Language">
+      <option value="en">English</option><option value="ko">한국어</option><option value="ja">日本語</option><option value="zh">中文</option><option value="es">Español</option>
+    </select>
+  </div>
+</header>
+
+<main id="main">
+  <section class="pane" aria-labelledby="hide_h">
+    <h1 id="hide_h" class="sr" data-t="app_title">Shadepad</h1>
+    <label for="input" data-t="app_in_label"></label>
+    <textarea id="input" rows="10" spellcheck="false" data-p="app_in_ph"></textarea>
+    <div class="row">
+      <button id="redact" class="btn" type="button" data-t="app_redact"></button>
+      <button id="clear" class="btn ghost" type="button" data-t="app_clear"></button>
+    </div>
+    <p id="summary" class="summary" aria-live="polite"></p>
+    <ul id="tags" class="tags"></ul>
+    <label for="output" data-t="app_out_label"></label>
+    <textarea id="output" rows="10" spellcheck="false" readonly></textarea>
+    <div class="row">
+      <button id="copy" class="btn" type="button" data-t="app_copy"></button>
+    </div>
+  </section>
+
+  <section class="pane" aria-labelledby="restore_h">
+    <h2 id="restore_h" data-t="app_restore_title"></h2>
+    <p class="muted" data-t="app_restore_hint"></p>
+    <label for="reply" data-t="app_restore_in_label"></label>
+    <textarea id="reply" rows="8" spellcheck="false"></textarea>
+    <div class="row">
+      <button id="restore" class="btn" type="button" data-t="app_restore_btn"></button>
+    </div>
+    <p id="restore_msg" class="summary" aria-live="polite"></p>
+    <label for="restored" data-t="app_restore_out_label"></label>
+    <textarea id="restored" rows="8" spellcheck="false" readonly></textarea>
+    <div class="row">
+      <button id="copy_restored" class="btn ghost" type="button" data-t="app_copy"></button>
+    </div>
+    <p class="muted" data-t="app_session_note"></p>
+  </section>
+</main>
+
+<div id="gate" class="gate" hidden>
+  <div class="card" role="dialog" aria-modal="true" aria-labelledby="gate_h">
+    <h2 id="gate_h" data-t="gate_t"></h2>
+    <p class="muted" data-t="gate_b"></p>
+    <label for="key" data-t="gate_key"></label>
+    <input id="key" type="text" autocomplete="off" spellcheck="false">
+    <div class="row">
+      <button id="unlock" class="btn" type="button" data-t="gate_unlock"></button>
+      <a id="buy" class="btn ghost" href="#" data-t="gate_buy" hidden></a>
+    </div>
+    <p id="gate_msg" class="summary" aria-live="polite"></p>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite"></div>
+<script src="../i18n.js"></script>
+<script src="../config.js"></script>
+<script src="core.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
