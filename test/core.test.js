@@ -2,7 +2,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const SP = require('../app/core.js');
 
-const kinds = (text) => SP.findAll(text).map((f) => f.kind);
+const kinds = (text, opts) => SP.findAll(text, opts).map((f) => f.kind);
 
 test('API keys and tokens of common providers are found', () => {
   const text = [
@@ -85,4 +85,79 @@ test('empty and missing input are safe', () => {
   assert.equal(SP.redact(null).text, '');
   assert.equal(SP.redact(undefined).occurrences, 0);
   assert.equal(SP.restore(null, null).text, '');
+});
+
+test('a category switched off is not hidden; the others still are', () => {
+  assert.deepEqual(SP.findAll('mail a@b.co', { enabled: { EMAIL: false } }), []);
+  assert.deepEqual(kinds('mail a@b.co 010-1234-5678', { enabled: { EMAIL: false } }), ['PHONE']);
+  assert.deepEqual(kinds('mail a@b.co', { enabled: {} }), ['EMAIL']);
+  assert.ok(SP.KINDS.includes('CARD') && SP.KINDS.includes('ID_NUMBER') && SP.KINDS.length === 9);
+});
+
+test('custom rules are literal, case-sensitive text, one per line, used by redact', () => {
+  const c = SP.compileCustom('ACME-123456\n  internal.corp  \n\n[x*]');
+  assert.deepEqual(c.errors, []);
+  assert.equal(c.rules.length, 3);
+  const r = SP.redact('ACME-123456 and internal.corp, not internalXcorp, and [x*] too', { custom: c.rules });
+  assert.equal(r.text, '[CUSTOM_1] and [CUSTOM_2], not internalXcorp, and [CUSTOM_3] too');
+});
+
+test('custom rule text is never read as a pattern', () => {
+  const c = SP.compileCustom('a.*b\n(a+)+$');
+  assert.deepEqual(c.errors, []);
+  const r = SP.redact('a.*b and axxb and aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!', { custom: c.rules });
+  assert.equal(r.text, '[CUSTOM_1] and axxb and aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa!');
+});
+
+test('custom rules that are too long or beyond the limit are reported', () => {
+  assert.deepEqual(SP.compileCustom('a'.repeat(201)).errors, [1]);
+  const many = Array.from({ length: 21 }, (_, i) => 'x' + i).join('\n');
+  const c = SP.compileCustom(many);
+  assert.equal(c.rules.length, 20);
+  assert.deepEqual(c.errors, [21]);
+});
+
+test('restore works in one pass, so a restored value is not scanned again', () => {
+  const back = SP.restore('[EMAIL_1] [EMAIL_2]', { '[EMAIL_1]': 'x [EMAIL_2] y', '[EMAIL_2]': 'b@c.io' });
+  assert.equal(back.text, 'x [EMAIL_2] y b@c.io');
+  assert.equal(back.replaced, 2);
+});
+
+test('redact reports the spans of each replaced place for the before and after view', () => {
+  const r = SP.redact('a@x.io!');
+  assert.deepEqual(r.spans, [{ start: 0, end: 6, kind: 'EMAIL', tag: '[EMAIL_1]' }]);
+});
+
+test('restore reports tag-shaped text it could not resolve', () => {
+  const back = SP.restore('[EMAIL_1] and [EMAIL_7] and [ERROR_2]', { '[EMAIL_1]': 'a@b.co' });
+  assert.equal(back.text, 'a@b.co and [EMAIL_7] and [ERROR_2]');
+  assert.equal(back.replaced, 1);
+  assert.equal(back.unknown, 2);
+});
+
+test('a reply with literal tags not in the map keeps them, and each occurrence is handled once', () => {
+  const map = { '[EMAIL_1]': 'a@b.co', '[PHONE_1]': '010-1234-5678' };
+  const back = SP.restore('[EMAIL_1] [EMAIL_1] [EMAIL_9] [PHONE_1]', map);
+  assert.equal(back.text, 'a@b.co a@b.co [EMAIL_9] 010-1234-5678');
+  assert.equal(back.replaced, 3);
+  assert.equal(back.unknown, 1);
+});
+
+test('a tag that is in the map is replaced even if the reply wrote it literally (known limit)', () => {
+  assert.equal(SP.restore('say [EMAIL_1]', { '[EMAIL_1]': 'a@b.co' }).text, 'say a@b.co');
+});
+
+test('a large log with many matches is hidden in one pass', () => {
+  const big = Array.from({ length: 5000 }, (_, i) => 'user' + i + '@example.com').join('\n');
+  const r = SP.redact(big);
+  assert.equal(r.occurrences, 5000);
+  assert.equal(Object.keys(r.map).length, 5000);
+});
+
+test('cleanMap accepts only tag maps with text values', () => {
+  assert.deepEqual(SP.cleanMap({ '[EMAIL_1]': 'a@b.co' }), { '[EMAIL_1]': 'a@b.co' });
+  assert.equal(SP.cleanMap({ 'EMAIL_1': 'x' }), null);
+  assert.equal(SP.cleanMap({ '[EMAIL_1]': 5 }), null);
+  assert.equal(SP.cleanMap(null), null);
+  assert.equal(SP.cleanMap(['x']), null);
 });

@@ -6,6 +6,7 @@
 <title>Shadepad</title>
 <meta name="description" content="Hide API keys, emails, phone numbers and card numbers before you paste text into an AI tool.">
 <meta name="theme-color" content="#0f766e">
+<meta name="color-scheme" content="light dark">
 <meta name="robots" content="noindex">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
@@ -23,24 +24,51 @@
 
 <main id="main">
   <section class="pane" aria-labelledby="hide_h">
-    <h1 id="hide_h" class="sr" data-t="app_title">Shadepad</h1>
+    <h1 class="sr" data-t="app_title">Shadepad</h1>
+    <h2 id="hide_h" class="step"><span class="num" aria-hidden="true">1</span><span data-t="app_step_hide"></span></h2>
     <label for="input" data-t="app_in_label"></label>
     <textarea id="input" rows="10" spellcheck="false" data-p="app_in_ph"></textarea>
+
+    <fieldset class="detect">
+      <legend data-t="app_detect_label"></legend>
+      <div id="kinds" class="kinds"></div>
+      <div class="row">
+        <button id="kinds_all" class="btn ghost" type="button" data-t="app_all"></button>
+        <button id="kinds_none" class="btn ghost" type="button" data-t="app_none"></button>
+      </div>
+    </fieldset>
+
+    <details id="custom_box" class="custom">
+      <summary data-t="app_custom_title"></summary>
+      <p class="muted" data-t="app_custom_hint"></p>
+      <label for="custom" data-t="app_custom_label"></label>
+      <textarea id="custom" rows="3" spellcheck="false"></textarea>
+      <p id="custom_msg" class="warn" aria-live="polite"></p>
+    </details>
+
     <div class="row">
       <button id="redact" class="btn" type="button" data-t="app_redact"></button>
       <button id="clear" class="btn ghost" type="button" data-t="app_clear"></button>
     </div>
     <p id="summary" class="summary" aria-live="polite"></p>
     <ul id="tags" class="tags"></ul>
+
+    <h3 id="diff_h" class="sub" data-t="app_diff_title"></h3>
+    <p class="muted" data-t="app_diff_hint"></p>
+    <div id="diff_wrap" hidden>
+      <div id="diff" class="diff" tabindex="0" role="region" aria-labelledby="diff_h"></div>
+    </div>
+
     <label for="output" data-t="app_out_label"></label>
+    <p id="stale" class="warn" aria-live="polite" hidden></p>
     <textarea id="output" rows="10" spellcheck="false" readonly></textarea>
     <div class="row">
-      <button id="copy" class="btn" type="button" data-t="app_copy"></button>
+      <button id="copy" class="btn" type="button" data-t="app_copy_redacted"></button>
     </div>
   </section>
 
   <section class="pane" aria-labelledby="restore_h">
-    <h2 id="restore_h" data-t="app_restore_title"></h2>
+    <h2 id="restore_h" class="step"><span class="num" aria-hidden="true">2</span><span data-t="app_restore_title"></span></h2>
     <p class="muted" data-t="app_restore_hint"></p>
     <label for="reply" data-t="app_restore_in_label"></label>
     <textarea id="reply" rows="8" spellcheck="false"></textarea>
@@ -51,9 +79,30 @@
     <label for="restored" data-t="app_restore_out_label"></label>
     <textarea id="restored" rows="8" spellcheck="false" readonly></textarea>
     <div class="row">
-      <button id="copy_restored" class="btn ghost" type="button" data-t="app_copy"></button>
+      <button id="copy_restored" class="btn ghost" type="button" data-t="app_copy_restored"></button>
     </div>
     <p class="muted" data-t="app_session_note"></p>
+
+    <details id="backup_box" class="backup">
+      <summary data-t="bk_title"></summary>
+      <p class="muted" data-t="bk_hint"></p>
+      <label for="pass" data-t="bk_pass"></label>
+      <input id="pass" type="password" autocomplete="off" spellcheck="false">
+      <div class="row">
+        <button id="bk_make" class="btn" type="button" data-t="bk_make"></button>
+      </div>
+      <label for="backup_out" data-t="bk_out_label"></label>
+      <textarea id="backup_out" rows="4" spellcheck="false" readonly></textarea>
+      <div class="row">
+        <button id="copy_backup" class="btn ghost" type="button" data-t="app_copy"></button>
+      </div>
+      <label for="backup_in" data-t="bk_in_label"></label>
+      <textarea id="backup_in" rows="4" spellcheck="false"></textarea>
+      <div class="row">
+        <button id="bk_load" class="btn ghost" type="button" data-t="bk_load"></button>
+      </div>
+      <p id="bk_msg" class="summary" aria-live="polite"></p>
+    </details>
   </section>
 </main>
 
@@ -75,6 +124,7 @@
 <script src="../i18n.js"></script>
 <script src="../config.js"></script>
 <script src="core.js"></script>
+<script src="vault.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

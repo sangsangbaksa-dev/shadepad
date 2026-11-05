@@ -7,8 +7,12 @@ Working name: the folder and the product name are not final. Check trademarks (K
 ## What it does
 
 - **Hide details**: finds the values with patterns and checks (Luhn for card numbers, digit counts for phones) and replaces each with a numbered tag such as `[EMAIL_1]`. The same value always gets the same tag. The app lists what was found, with a partly masked preview.
-- **Restore**: paste the AI reply into the restore box and the tags become the original values again. Only tags from the most recent "Hide details" on the page can be restored.
-- **Copy** the masked text or the restored text.
+- **Per-category switches**: each of the nine built-in categories (email, phone, API key, private key, token, password or secret, card number, resident ID, IP address) can be turned off for the page. Switches are kept in memory only.
+- **Custom rules**: exact text to hide, one per line (for example `ACME-123456` or `internal.corp`). Rules are plain text, not patterns, and case-sensitive. They are limited to 20 rules of at most 200 characters, and over-long lines are reported instead of used. Matches are hidden as `[CUSTOM_n]`. Ctrl+Enter (Cmd+Enter) hides details from the text boxes, and restores from the AI reply box.
+- **Summary and before/after view**: the count line says how many values were hidden and in how many places. A before/after view shows each replaced place, struck through, beside its tag, and a notice appears if the text was edited after the last hide.
+- **Restore**: paste the AI reply into the restore box and the tags become the original values again. Restore reads each tag once, so a restored value is never changed a second time. Only tags from the most recent "Hide details" on the page can be restored, unless a session backup has been opened.
+- **Copy** the hidden text or the restored text.
+- **Session backup (optional)**: the originals can be saved as one text block encrypted with a passphrase (AES-GCM, key from PBKDF2-SHA-256, 310,000 iterations). Paste it back after a reload and restore works again. The block is shown on the page for you to copy; nothing is uploaded or stored. Without the passphrase it cannot be opened, and a lost passphrase means the backup is lost.
 - **Nothing stored**: the text and the originals stay in memory on the page. Reloading clears them. Only the language and, after unlocking, the licence key are kept in `localStorage`.
 
 ## Layout
@@ -17,10 +21,10 @@ Working name: the folder and the product name are not final. Check trademarks (K
 - `privacy.html`, `terms.html`: legal pages, text in `i18n.js`.
 - `i18n.js`: all user-visible strings (five languages, same keys).
 - `config.js`: `siteUrl`, `checkoutUrl`, `price`. Change these before launch.
-- `app/`: the app. `core.js` is pure logic (no DOM, no network, no storage) and is unit-tested. `app.js` builds the UI with `textContent` and `value` only.
+- `app/`: the app. `core.js` is pure logic (no DOM, no network, no storage) and is unit-tested: detection, switches, custom rules, redact, restore. `vault.js` is the passphrase encryption for session backups (Web Crypto only). `app.js` builds the UI with `textContent` and `value` only.
 - `functions/api/license.js` + `lib/license-core.js`: Cloudflare Pages Function for the licence check (Lemon Squeezy License API). Same contract as Quotanest.
 - `scripts/build.js`: writes `sitemap.xml` and `robots.txt`, and with `--dist` copies the public files to `dist/`.
-- `test/`: `core.test.js` (detection, redact, restore), `license.test.js`.
+- `test/`: `core.test.js` (detection, switches, custom rules, redact, restore), `vault.test.js` (session backup), `license.test.js`.
 
 ## Tests and build
 
@@ -46,5 +50,8 @@ If the server answers `configured: false`, the app opens without a key. If licen
 ## Known limits
 
 - Detection is pattern based. It can miss secrets in unusual formats and can flag harmless numbers, so the output must be checked before sharing.
-- Restore works only in the same page session. Reloading clears the originals.
+- Restore works only in the same page session, unless an encrypted session backup is opened. Reloading clears the originals.
+- Custom rules are literal text, so they cannot cause catastrophic regex backtracking. Built-in patterns are unchanged.
+- Switches and custom rules are not saved between reloads, by design (only the language and licence key are stored).
 - Names are not detected (a person's name is not a pattern), and free text such as addresses is not detected.
+- Turning off a category can let its text be picked up by another category (for example digits found as a phone number when card numbers are off).
