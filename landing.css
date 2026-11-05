@@ -8,7 +8,10 @@ html, body { margin: 0; }
 body { background: var(--bg); color: var(--ink); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", "Apple SD Gothic Neo", "Hiragino Sans", "PingFang SC", "Noto Sans", sans-serif; overflow-x: hidden; }
 a { color: var(--accent); }
 header.site, footer.site { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; padding: 14px 16px; max-width: 960px; margin: 0 auto; }
-header.site .brand { font-weight: 800; color: var(--ink); text-decoration: none; font-size: 18px; letter-spacing: -0.02em; }
+header.site .brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; font-weight: 800; color: var(--ink); text-decoration: none; font-size: 18px; letter-spacing: -0.02em; }
+.mark { width: 30px; height: 30px; flex: none; display: block; }
+.mark .m-bg { fill: var(--accent); }
+.mark .m-bar { fill: var(--accent-ink); }
 .hdr { display: flex; align-items: center; gap: 10px; font-size: 14px; }
 .hdr select { font: inherit; font-size: 13px; background: var(--panel); color: var(--ink); border: 1px solid var(--line); border-radius: 8px; padding: 5px 8px; }
 main { max-width: 960px; margin: 0 auto; padding: 8px 16px 48px; }
@@ -30,8 +33,15 @@ details { background: var(--panel); border: 1px solid var(--line); border-radius
 summary { cursor: pointer; font-weight: 600; }
 details p { color: var(--muted); margin: 8px 0 0; }
 .nonaff { color: var(--muted); font-size: 13px; margin-top: 36px; border-top: 1px solid var(--line); padding-top: 14px; }
-footer.site { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); margin-top: 24px; }
+footer.site { color: var(--muted); font-size: 13px; border-top: 1px solid var(--line); margin-top: 24px; flex-wrap: wrap; }
+footer.site .foot-copy { margin: 0; width: 100%; }
+footer.site nav a { display: inline-flex; align-items: center; min-height: 44px; }
 footer.site nav a { color: var(--muted); margin-left: 12px; }
+footer.site nav a:hover { color: var(--ink); }
+a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.btn { transition: transform 0.15s ease, opacity 0.15s ease; }
+.btn:hover { opacity: 0.92; }
+@media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 .legal main h1 { font-size: 30px; margin: 10px 0 6px; }
 .legal main p { margin: 0 0 14px; }
 .muted { color: var(--muted); font-size: 14px; }

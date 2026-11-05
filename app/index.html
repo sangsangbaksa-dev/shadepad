@@ -7,13 +7,19 @@
 <meta name="description" content="Hide API keys, emails, phone numbers and card numbers before you paste text into an AI tool.">
 <meta name="theme-color" content="#0f766e">
 <meta name="color-scheme" content="light dark">
+<meta property="og:title" content="Shadepad">
+<meta property="og:description" content="Hide secrets before you paste into AI. Runs in your browser.">
+<meta property="og:type" content="website">
 <meta name="robots" content="noindex">
 <link rel="icon" href="../icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 <header class="top">
-  <a class="brand" href="../" data-t="brand">Shadepad</a>
+  <a class="brand" href="../">
+    <svg class="mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect class="m-bg" width="64" height="64" rx="14"/><rect class="m-bar" x="14" y="18" width="36" height="6" rx="3"/><rect class="m-bar" x="14" y="30" width="22" height="6" rx="3" opacity="0.55"/><rect class="m-bar" x="14" y="42" width="30" height="6" rx="3" opacity="0.85"/></svg>
+    <span class="brand-text"><span class="brand-name" data-t="brand">Shadepad</span><span class="brand-tag" data-t="app_tagline"></span></span>
+  </a>
   <div class="hdr">
     <label class="sr" for="lang" data-t="set_lang">Language</label>
     <select id="lang" aria-label="Language">
@@ -129,6 +135,22 @@
     </details>
   </section>
 </main>
+
+<footer class="site-foot">
+  <div class="foot-brand">
+    <a class="brand" href="../">
+      <svg class="mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false"><rect class="m-bg" width="64" height="64" rx="14"/><rect class="m-bar" x="14" y="18" width="36" height="6" rx="3"/><rect class="m-bar" x="14" y="30" width="22" height="6" rx="3" opacity="0.55"/><rect class="m-bar" x="14" y="42" width="30" height="6" rx="3" opacity="0.85"/></svg>
+      <span class="brand-name" data-t="brand">Shadepad</span>
+    </a>
+    <p class="foot-desc" data-t="footer_note"></p>
+    <p class="foot-desc" data-t="app_footer_privacy"></p>
+  </div>
+  <nav class="foot-nav" aria-label="Legal">
+    <a href="../privacy.html" data-t="nav_privacy">Privacy</a>
+    <a href="../terms.html" data-t="nav_terms">Terms</a>
+  </nav>
+  <p class="foot-copy">&copy; 2026 Shadepad</p>
+</footer>
 
 <div id="gate" class="gate" hidden>
   <div class="card" role="dialog" aria-modal="true" aria-labelledby="gate_h">

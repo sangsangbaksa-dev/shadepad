@@ -407,3 +407,15 @@ window.SP_I18N = {
     gate_invalid: 'Esa clave no es válida para Shadepad.', gate_refunded: 'Esa clave ha sido reembolsada o desactivada.', gate_unreachable: 'No se pudo conectar con el servidor de licencias. Inténtalo de nuevo en un momento.'
   }
 };
+
+/* Site header and footer strings for the app shell (added with the site-style pass). */
+(function () {
+  var add = {
+    en: { app_tagline: 'Hide secrets before you paste into AI, then restore them in the reply.', app_footer_privacy: 'Runs in your browser. Nothing you paste is uploaded or stored.' },
+    ko: { app_tagline: 'AI에 붙여넣기 전에 비밀 값을 가리고, 답변에서 다시 복원하세요.', app_footer_privacy: '브라우저 안에서 실행됩니다. 붙여넣은 내용은 업로드되거나 저장되지 않습니다.' },
+    ja: { app_tagline: '機密情報をAIに貼る前に隠し、返答で元に戻します。', app_footer_privacy: 'ブラウザ内で動作します。貼り付けた内容はアップロードも保存もされません。' },
+    zh: { app_tagline: '在粘贴到 AI 之前遮住机密信息，回复后再还原。', app_footer_privacy: '在浏览器中运行。粘贴的内容不会上传或保存。' },
+    es: { app_tagline: 'Oculta los datos sensibles antes de pegar en una IA y recupéralos en la respuesta.', app_footer_privacy: 'Se ejecuta en tu navegador. Lo que pegas no se sube ni se guarda.' }
+  };
+  Object.keys(add).forEach(function (l) { Object.assign(window.SP_I18N[l], add[l]); });
+})();
