@@ -1,30 +1,30 @@
 /* Shadepad app styles. Colours are tokens on :root; dark values repeat under both dark selectors. */
 :root {
   color-scheme: light;
-  --bg: #f5f6f8;
+  --bg: #F8FAFC;
   --panel: #ffffff;
   --sunken: #f8f9fb;
-  --ink: #14171c;
+  --ink: #0A1628;
   --muted: #545c69;
   --line: #d9dde3;
   --line-strong: #b9c0ca;
-  --accent: #0f766e;
-  --accent-hover: #0c5f58;
+  --accent: #0B6E4F;
+  --accent-hover: #064D36;
   --accent-ink: #ffffff;
-  --chip: #e6f4f2;
+  --chip: #e7f3ee;
   --warn: #9a4a06;
   --del: #b42318;
   --del-bg: #fdeceb;
-  --focus: #0f766e;
+  --focus: #0B6E4F;
   --radius: 14px;
   --radius-sm: 10px;
   --shadow: 0 1px 2px rgba(20, 23, 28, 0.04), 0 4px 16px rgba(20, 23, 28, 0.04);
   --tap: 44px;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #0e1115; --panel: #161a20; --sunken: #0e1115; --ink: #e8ebf0; --muted: #a7b0bd; --line: #2c333d; --line-strong: #404856; --accent: #5eead4; --accent-hover: #7af0dc; --accent-ink: #04201e; --chip: #15302d; --warn: #fcd34d; --del: #fca5a5; --del-bg: #3b1b1f; --focus: #5eead4; --shadow: none; }
+  :root:not([data-theme="light"]) { color-scheme: dark; --bg: #0e1115; --panel: #161a20; --sunken: #0e1115; --ink: #e8ebf0; --muted: #a7b0bd; --line: #2c333d; --line-strong: #404856; --accent: #5ad3a4; --accent-hover: #7fe0b8; --accent-ink: #06231a; --chip: #133228; --warn: #fcd34d; --del: #fca5a5; --del-bg: #3b1b1f; --focus: #5ad3a4; --shadow: none; }
 }
-:root[data-theme="dark"] { color-scheme: dark; --bg: #0e1115; --panel: #161a20; --sunken: #0e1115; --ink: #e8ebf0; --muted: #a7b0bd; --line: #2c333d; --line-strong: #404856; --accent: #5eead4; --accent-hover: #7af0dc; --accent-ink: #04201e; --chip: #15302d; --warn: #fcd34d; --del: #fca5a5; --del-bg: #3b1b1f; --focus: #5eead4; --shadow: none; }
+:root[data-theme="dark"] { color-scheme: dark; --bg: #0e1115; --panel: #161a20; --sunken: #0e1115; --ink: #e8ebf0; --muted: #a7b0bd; --line: #2c333d; --line-strong: #404856; --accent: #5ad3a4; --accent-hover: #7fe0b8; --accent-ink: #06231a; --chip: #133228; --warn: #fcd34d; --del: #fca5a5; --del-bg: #3b1b1f; --focus: #5ad3a4; --shadow: none; }
 
 * { box-sizing: border-box; }
 [hidden] { display: none !important; }
@@ -70,7 +70,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input[type="checkb
 .btn:not(:disabled):hover { background: var(--accent-hover); border-color: var(--accent-hover); }
 .btn.ghost:not(:disabled):hover { background: var(--chip); border-color: var(--accent); color: var(--ink); }
 .btn:not(:disabled):active { transform: translateY(1px); }
-.btn:not(:disabled):hover { box-shadow: 0 2px 8px rgba(15, 118, 110, 0.18); }
+.btn:not(:disabled):hover { box-shadow: 0 2px 8px rgba(11, 110, 79, 0.18); }
 .btn.ghost:not(:disabled):hover { box-shadow: none; }
 
 /* Text helpers */
@@ -139,3 +139,8 @@ details[open] > summary { margin-bottom: 4px; }
   .step { font-size: 18px; }
   .row .btn { flex: 1 1 auto; }
 }
+
+/* Site pattern pass: serif display font for headings, larger radii on cards. */
+:root { --display: Georgia, "Times New Roman", "Nanum Myeongjo", "Batang", serif; }
+h2 { font-family: var(--display); font-weight: 700; }
+.pane { border-radius: 1.25rem; }
