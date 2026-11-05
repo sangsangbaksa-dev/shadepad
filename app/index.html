@@ -65,6 +65,30 @@
     <div class="row">
       <button id="copy" class="btn" type="button" data-t="app_copy_redacted"></button>
     </div>
+
+    <section id="ai_box" class="ai" aria-labelledby="ai_h">
+      <h3 id="ai_h" class="sub" data-t="ai_title"></h3>
+      <p class="muted" data-t="ai_hint"></p>
+      <p id="ai_local_sum" class="summary" aria-live="polite"></p>
+      <ul id="ai_local" class="tags"></ul>
+      <div class="row">
+        <button id="ai_run" class="btn ghost" type="button" data-t="ai_run"></button>
+      </div>
+      <p id="ai_msg" class="summary" aria-live="polite"></p>
+      <ul id="ai_items" class="tags"></ul>
+      <p class="muted" data-t="ai_privacy"></p>
+      <details class="ai-key">
+        <summary data-t="ai_key_title"></summary>
+        <p class="muted" data-t="ai_key_hint"></p>
+        <label for="ai_key" data-t="ai_key_label"></label>
+        <input id="ai_key" type="password" autocomplete="off" spellcheck="false">
+        <div class="row">
+          <button id="ai_save" class="btn ghost" type="button" data-t="ai_save"></button>
+          <button id="ai_forget" class="btn ghost" type="button" data-t="ai_forget"></button>
+        </div>
+        <p id="ai_key_msg" class="summary" aria-live="polite"></p>
+      </details>
+    </section>
   </section>
 
   <section class="pane" aria-labelledby="restore_h">

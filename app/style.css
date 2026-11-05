@@ -47,6 +47,9 @@ details[open] > summary { margin-bottom: 2px; }
 .diff { white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.6 ui-monospace, SFMono-Regular, Menlo, Consolas, "Noto Sans Mono CJK KR", monospace; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; max-height: 280px; overflow: auto; margin: 6px 0 0; }
 .diff del { text-decoration: line-through; background: var(--del-bg); color: var(--del); border-radius: 4px; padding: 0 2px; }
 .diff ins { text-decoration: none; background: var(--chip); color: var(--accent); font-weight: 700; border-radius: 4px; padding: 0 3px; }
+.ai { border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 4px; }
+.ai-key { margin-top: 10px; }
+.ai .tags:empty { display: none; }
 .backup { border-top: 1px dashed var(--line); margin-top: 18px; padding-top: 6px; }
 .gate { position: fixed; inset: 0; background: rgba(10, 12, 16, 0.55); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
 .gate .card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px; width: min(420px, 100%); }

@@ -105,6 +105,10 @@
     renderTags();
     renderDiff();
     updateStale();
+    renderLocal();
+    renderAiItems();
+    renderAiKeyMsg();
+    updateAi();
     refreshMsgs();
   }
 
@@ -246,6 +250,10 @@
     renderTags();
     renderDiff();
     updateStale();
+    resetAi();
+    localRes = SP.localCheck(r.text);
+    renderLocal();
+    updateAi();
   });
 
   $('clear').addEventListener('click', function () {
@@ -264,6 +272,10 @@
     renderTags();
     renderDiff();
     updateStale();
+    resetAi();
+    localRes = null;
+    renderLocal();
+    updateAi();
   });
 
   $('copy').addEventListener('click', function () { copyText('output'); });
@@ -279,6 +291,174 @@
       return r.unknown ? a + ' ' + t('app_restore_unknown', { n: r.unknown }) : a;
     });
     updateStale();
+  });
+
+  /* ---------- AI check (optional, your own API key) ---------- */
+
+  /* The key is kept in this browser under AI_KEY, and only sent to api.anthropic.com when the run button is pressed.
+     If the browser refuses to store it, it is kept for this page only. */
+  var AI_KEY = 'shadepad-ai-key';
+  var aiMemKey = '';
+  var localRes = null; /* SP.localCheck result for the current hidden text */
+  var aiRes = null;    /* { items, none } from the AI reply for the current hidden text */
+  var aiBusy = false;
+  var aiSeq = 0;       /* bumped whenever the hidden text changes, so a late reply is dropped */
+
+  function readAiKey() {
+    try {
+      var v = localStorage.getItem(AI_KEY);
+      if (v && v.trim()) return v.trim();
+    } catch (e) { /* storage blocked: use the page copy */ }
+    return aiMemKey;
+  }
+  function saveAiKey(k) {
+    try { localStorage.setItem(AI_KEY, k); aiMemKey = ''; return true; } catch (e) { aiMemKey = k; return false; }
+  }
+  function forgetAiKey() {
+    aiMemKey = '';
+    try { localStorage.removeItem(AI_KEY); } catch (e) { /* nothing stored */ }
+  }
+
+  function renderLocal() {
+    var list = $('ai_local');
+    list.textContent = '';
+    if (!localRes) { setMsg('ai_local_sum', 'ai_local_empty'); return; }
+    setRender('ai_local_sum', function () { return t('ai_local_sum', { n: localRes.total, m: localRes.leftovers.length }); });
+    if (localRes.leftovers.length === 0) {
+      var none = document.createElement('li');
+      none.textContent = t('ai_local_none');
+      list.appendChild(none);
+      return;
+    }
+    localRes.leftovers.forEach(function (x) {
+      var li = document.createElement('li');
+      var kind = document.createElement('span');
+      kind.className = 'kind';
+      kind.textContent = t('ai_left_' + x.kind);
+      var pv = document.createElement('span');
+      pv.className = 'pv';
+      pv.textContent = SP.preview(x.value);
+      li.appendChild(kind);
+      li.appendChild(pv);
+      list.appendChild(li);
+    });
+  }
+
+  function renderAiItems() {
+    var list = $('ai_items');
+    list.textContent = '';
+    if (!aiRes) return;
+    if (aiRes.none) {
+      var none = document.createElement('li');
+      none.textContent = t('ai_none');
+      list.appendChild(none);
+    }
+    aiRes.items.forEach(function (s) {
+      var li = document.createElement('li');
+      li.textContent = s;
+      list.appendChild(li);
+    });
+  }
+
+  function renderAiKeyMsg() {
+    setRender('ai_key_msg', function () {
+      var k = readAiKey();
+      return k ? t('ai_key_saved', { tail: k.slice(-4) }) : t('ai_key_none');
+    });
+  }
+
+  /* The run button needs a key and hidden text. A missing one is named in the status line;
+     that line is cleared only when the reason was ours, so a run result or error is never wiped here. */
+  var aiReason = null;
+  function updateAi() {
+    var hasKey = !!readAiKey(), hasText = !!$('output').value;
+    $('ai_run').disabled = !hasKey || !hasText || aiBusy;
+    if (aiBusy) return;
+    var reason = !hasText ? 'ai_need_text' : !hasKey ? 'ai_need_key' : null;
+    if (reason) { aiReason = reason; setMsg('ai_msg', reason); }
+    else if (aiReason) { aiReason = null; setMsg('ai_msg', null); }
+  }
+
+  function resetAi() {
+    aiSeq++;
+    aiBusy = false;
+    aiRes = null;
+    aiReason = null;
+    renderAiItems();
+    setMsg('ai_msg', null);
+  }
+
+  function aiErrorKey(e) {
+    if (!e || typeof e.status !== 'number') return 'ai_err_net';
+    if (e.status === 401 || e.status === 403) return 'ai_err_key';
+    if (e.status === 429) return 'ai_err_rate';
+    return 'ai_err_http';
+  }
+
+  /* Sends the HIDDEN text (the output box) with the check instruction. Never the originals. Runs only on click. */
+  function runAi() {
+    var key = readAiKey(), hidden = $('output').value;
+    if (!key || !hidden || aiBusy) return;
+    var seq = aiSeq;
+    aiBusy = true;
+    aiRes = null;
+    renderAiItems();
+    setMsg('ai_msg', 'ai_working');
+    updateAi();
+    var body = JSON.stringify(SP.requestBody(SP.checkPrompt(hidden, state.lang)));
+    var req;
+    try {
+      req = fetch(SP.AI.url, {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': key,
+          'anthropic-version': SP.AI.version,
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: body,
+        cache: 'no-store'
+      });
+    } catch (e) {
+      req = Promise.reject(e);
+    }
+    req.then(function (r) {
+      if (!r.ok) { var err = new Error('http'); err.status = r.status; throw err; }
+      return r.json();
+    }).then(function (j) {
+      if (seq !== aiSeq) return;
+      var parsed = SP.parseCheckReply(SP.replyText(j));
+      if (!parsed.none && parsed.items.length === 0) { aiRes = null; setMsg('ai_msg', 'ai_bad_reply'); return; }
+      aiRes = parsed;
+      setMsg('ai_msg', 'ai_done');
+    }).catch(function (e) {
+      if (seq !== aiSeq) return;
+      aiRes = null;
+      setMsg('ai_msg', aiErrorKey(e));
+    }).then(function () {
+      if (seq !== aiSeq) return;
+      aiBusy = false;
+      renderAiItems();
+      updateAi();
+    });
+  }
+
+  $('ai_run').addEventListener('click', runAi);
+
+  $('ai_save').addEventListener('click', function () {
+    var k = $('ai_key').value.trim();
+    if (!k) { setMsg('ai_key_msg', 'ai_key_empty'); return; }
+    var stored = saveAiKey(k);
+    $('ai_key').value = '';
+    if (stored) renderAiKeyMsg(); else setMsg('ai_key_msg', 'ai_key_nostore');
+    updateAi();
+  });
+
+  $('ai_forget').addEventListener('click', function () {
+    forgetAiKey();
+    $('ai_key').value = '';
+    renderAiKeyMsg();
+    updateAi();
   });
 
   /* ---------- encrypted session backup ---------- */
