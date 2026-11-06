@@ -55,34 +55,34 @@
   var TAG_RE = /\[[A-Z][A-Z0-9_]*_\d+\]/g;
   var TAG_FULL_RE = /^\[[A-Z][A-Z0-9_]*_\d+\]$/;
 
-  /* Returns [{ kind, value, start, end }] sorted by position. Overlaps keep the earlier rule. */
+  /* Merge overlapping matches so custom rules cannot expose the unclaimed part of a secret.
+     The earliest rule determines the category; the entire union is hidden and restored exactly. */
   function findAll(text, opts) {
     var src = String(text == null ? '' : text);
     var enabled = (opts && opts.enabled) || {};
     var custom = (opts && opts.custom) || [];
     var rules = RULES.concat(custom).filter(function (r) { return enabled[r.kind] !== false; });
-    /* used[i] marks a character already claimed by an earlier match. Linear in the text length,
-       unlike comparing each match with every earlier one (which is quadratic on large logs). */
-    var used = new Uint8Array(src.length), out = [];
-    rules.forEach(function (rule) {
-      var re = new RegExp(rule.re.source, rule.re.flags);
-      var m;
+    var candidates = [];
+    rules.forEach(function (rule, priority) {
+      var re = new RegExp(rule.re.source, rule.re.flags), m;
       while ((m = re.exec(src)) !== null) {
-        if (m[0].length === 0) { re.lastIndex++; continue; }
+        if (!m[0].length) { re.lastIndex++; continue; }
         var value = rule.group ? m[rule.group] : m[0];
-        if (!value) continue;
+        if (!value || (rule.check && !rule.check(value))) continue;
         var start = rule.group ? m.index + m[0].lastIndexOf(value) : m.index;
-        var end = start + value.length;
-        if (rule.check && !rule.check(value)) continue;
-        var clash = false;
-        for (var p = start; p < end; p++) { if (used[p]) { clash = true; break; } }
-        if (clash) continue;
-        for (p = start; p < end; p++) used[p] = 1;
-        out.push({ kind: rule.kind, value: value, start: start, end: end });
+        candidates.push({ kind: rule.kind, start: start, end: start + value.length, priority: priority });
       }
     });
-    out.sort(function (a, b) { return a.start - b.start; });
-    return out;
+    candidates.sort(function (a, b) { return a.start - b.start || b.end - a.end || a.priority - b.priority; });
+    var merged = [];
+    candidates.forEach(function (f) {
+      var last = merged[merged.length - 1];
+      if (last && f.start < last.end) {
+        last.end = Math.max(last.end, f.end);
+        if (f.priority < last.priority) { last.kind = f.kind; last.priority = f.priority; }
+      } else merged.push({ kind: f.kind, start: f.start, end: f.end, priority: f.priority });
+    });
+    return merged.map(function (f) { return { kind: f.kind, value: src.slice(f.start, f.end), start: f.start, end: f.end }; });
   }
 
   /* The same value always gets the same tag.
@@ -147,7 +147,7 @@
      Returns { rules: [{ kind: 'CUSTOM', re }], errors: [line numbers] }.
      Lines that are too long or beyond the limit are reported, not used. */
   function compileCustom(text) {
-    var lines = String(text == null ? '' : text).split(/\r?\n/);
+    var lines = String(text == null ? '' : text).split(/\r\n|[\r\n]/);
     var rules = [], errors = [];
     lines.forEach(function (line, i) {
       var s = line.trim();
