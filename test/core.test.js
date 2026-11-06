@@ -200,3 +200,30 @@ test('escaped single quotes in quoted assignments stay hidden', () => {
   assert.equal(redacted.text, "password='[SECRET_1]'");
   assert.equal(SP.restore(redacted.text, redacted.map).text, input);
 });
+
+
+test('explicit assignments hide short secrets instead of leaving them exposed', () => {
+  const input = 'password="abc" token=1234 pwd=xy';
+  const redacted = SP.redact(input);
+  assert.equal(redacted.text, 'password="[SECRET_1]" token=[SECRET_2] pwd=[SECRET_3]');
+  assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+});
+
+test('compact Korean mobile numbers are recognized without changing adjacent Korean text', () => {
+  const input = '연락처01012345678입니다. 예전 번호 0111234567';
+  const redacted = SP.redact(input);
+  assert.equal(redacted.text, '연락처[PHONE_1]입니다. 예전 번호 [PHONE_2]');
+  assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+  assert.deepEqual(SP.findAll('order A01012345678B and 1010123456789'), []);
+});
+
+
+test('unquoted JSON secret values leave structural delimiters intact', () => {
+  for (const input of ['{"token":1234}', '[{"token":1234},{"pwd":12}]']) {
+    const redacted = SP.redact(input);
+    assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+    assert.ok(redacted.text.endsWith(input.endsWith(']') ? '}]' : '}'));
+    assert.ok(Object.values(redacted.map).every(value => /^\d+$/.test(value)));
+  }
+  assert.deepEqual(SP.findAll('0101234567'), []);
+});
