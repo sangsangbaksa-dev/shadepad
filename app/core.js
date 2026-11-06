@@ -23,9 +23,9 @@
   /* Order matters: an earlier rule claims its text first, so a card number is not also a phone number. */
   var RULES = [
     { kind: 'PRIVATE_KEY', re: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z0-9 ]*PRIVATE KEY-----/g },
-    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*"((?:\\.|[^"\\\r\n]){6,})"/gi, group: 1 },
-    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*'((?:\\.|[^'\\\r\n]){6,})'/gi, group: 1 },
-    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*([^\s"',;&]{6,})/gi, group: 1 },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*"((?:\\.|[^"\\\r\n]){1,})"/gi, group: 1 },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*'((?:\\.|[^'\\\r\n]){1,})'/gi, group: 1 },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*([^\s"',;&}\]]{1,})/gi, group: 1 },
     { kind: 'API_KEY', re: /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g },
     { kind: 'API_KEY', re: /\bgh[pousr]_[A-Za-z0-9]{30,}\b|\bgithub_pat_[A-Za-z0-9_]{40,}\b/g },
     { kind: 'API_KEY', re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g },
@@ -43,6 +43,7 @@
       kind: 'PHONE', re: /(?<![\w+])(?:\+\d{1,3}[ .-]?)?\(?\d{2,4}\)?[ .-]\d{3,4}[ .-]\d{4}(?!\w)/g,
       check: function (v) { var d = digitsOf(v); return d.length >= 9 && d.length <= 15 && (v.charAt(0) === '+' || d.length <= 11); }
     },
+    { kind: 'PHONE', re: /(?<![\w+])(?:010\d{8}|01[16789]\d{7,8})(?!\w)/g },
     { kind: 'IP', re: /(?<![\d.])(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)(?!\d|\.\d)/g }
   ];
 
