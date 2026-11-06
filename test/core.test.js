@@ -227,3 +227,13 @@ test('unquoted JSON secret values leave structural delimiters intact', () => {
   }
   assert.deepEqual(SP.findAll('0101234567'), []);
 });
+
+
+test('structured secret fields do not lose JSON opening delimiters', () => {
+  for (const input of ['{"token":{}}', '{"token":[]}', '{"secret":{"label":"ordinary"}}']) {
+    const redacted = SP.redact(input);
+    assert.equal(redacted.text, input);
+    assert.deepEqual(JSON.parse(redacted.text), JSON.parse(input));
+    assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+  }
+});

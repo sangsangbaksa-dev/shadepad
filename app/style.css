@@ -85,3 +85,11 @@ details[open] > summary { margin-bottom: 2px; }
   }
   @media (prefers-reduced-motion: reduce) { .btn { transition: none; } }
 }
+
+/* Keep the active work area clear while reviewing dense text. */
+@media screen {
+  .pane:focus-within { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); }
+  .diff { padding: 14px 16px; line-height: 1.75; scrollbar-gutter: stable; }
+  .step + p { max-width: 65ch; }
+  @media (max-width: 600px) { .row { gap: 10px; } .diff { padding: 12px; } }
+}
