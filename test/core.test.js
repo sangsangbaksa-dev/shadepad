@@ -237,3 +237,31 @@ test('structured secret fields do not lose JSON opening delimiters', () => {
     assert.equal(SP.restore(redacted.text, redacted.map).text, input);
   }
 });
+
+
+test('custom literal rules recognize CR-only and mixed line endings independently', () => {
+  const compiled = SP.compileCustom('내부고객\rProject-A\r\nPrivate-B\nSecret-C');
+  assert.equal(compiled.rules.length, 4);
+  assert.deepEqual(compiled.errors, []);
+  const original = '내부고객 Project-A Private-B Secret-C';
+  const redacted = SP.redact(original, { custom: compiled.rules });
+  assert.equal(redacted.occurrences, 4);
+  assert.equal(SP.restore(redacted.text, redacted.map).text, original);
+});
+
+
+test('overlapping custom and built-in rules hide the complete union and restore exactly', () => {
+  for (const input of ['내부 고객 user@example.com', 'user@example.com secret suffix']) {
+    const r = SP.redact(input, { custom: SP.compileCustom(input).rules });
+    assert.equal(r.occurrences, 1);
+    assert.equal(Object.values(r.map)[0], input);
+    assert.equal(SP.restore(r.text, r.map).text, input);
+  }
+  const key = '-----BEGIN PRIVATE KEY-----\nprivate-material\n-----END PRIVATE KEY-----';
+  const r = SP.redact(key, { custom: SP.compileCustom('private-material').rules });
+  assert.equal(r.text, '[PRIVATE_KEY_1]');
+  assert.equal(SP.restore(r.text, r.map).text, key);
+  const chain = SP.redact('abcdefghi', { custom: SP.compileCustom('abcde\ndefgh\nghi').rules });
+  assert.equal(Object.values(chain.map)[0], 'abcdefghi');
+  assert.equal(SP.restore(chain.text, chain.map).text, 'abcdefghi');
+});
