@@ -23,6 +23,9 @@
   /* Order matters: an earlier rule claims its text first, so a card number is not also a phone number. */
   var RULES = [
     { kind: 'PRIVATE_KEY', re: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z0-9 ]*PRIVATE KEY-----/g },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*"((?:\\.|[^"\\\r\n]){6,})"/gi, group: 1 },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*'((?:\\.|[^'\\\r\n]){6,})'/gi, group: 1 },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*([^\s"',;&]{6,})/gi, group: 1 },
     { kind: 'API_KEY', re: /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g },
     { kind: 'API_KEY', re: /\bgh[pousr]_[A-Za-z0-9]{30,}\b|\bgithub_pat_[A-Za-z0-9_]{40,}\b/g },
     { kind: 'API_KEY', re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g },
@@ -30,7 +33,6 @@
     { kind: 'API_KEY', re: /\bxox[abposr]-[A-Za-z0-9-]{10,}/g },
     { kind: 'API_KEY', re: /\b(?:sk|rk|pk)_(?:live|test)_[A-Za-z0-9]{16,}\b/g },
     { kind: 'TOKEN', re: /\beyJ[A-Za-z0-9_-]{8,}\.eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]{8,}/g },
-    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b\s*[:=]\s*["']?([^\s"',;&]{6,})/gi, group: 1 },
     { kind: 'ID_NUMBER', re: /(?<!\d)\d{6}-[1-4]\d{6}(?!\d)/g },
     {
       kind: 'CARD', re: /(?<![\w-])(?:\d[ -]?){12,18}\d(?![\w-])/g,
@@ -88,13 +90,17 @@
   function redact(input, opts) {
     var src = String(input == null ? '' : input);
     var found = findAll(src, opts);
-    var perKind = {}, tagOf = {}, map = {}, spans = [], parts = [], last = 0;
+    var perKind = {}, seqByKind = {}, tagOf = {}, map = {}, spans = [], parts = [], last = 0;
+    // Preserve literal placeholders already present in the original text.
+    var reserved = new Set(src.match(TAG_RE) || []);
     found.forEach(function (f) {
       var key = f.kind + '\n' + f.value;
       var tag = tagOf[key];
       if (!tag) {
         perKind[f.kind] = (perKind[f.kind] || 0) + 1;
-        tag = '[' + f.kind + '_' + perKind[f.kind] + ']';
+        seqByKind[f.kind] = (seqByKind[f.kind] || 0) + 1;
+        tag = '[' + f.kind + '_' + seqByKind[f.kind] + ']';
+        while (reserved.has(tag)) { seqByKind[f.kind]++; tag = '[' + f.kind + '_' + seqByKind[f.kind] + ']'; }
         tagOf[key] = tag;
         map[tag] = f.value;
       }
