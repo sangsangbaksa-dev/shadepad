@@ -25,7 +25,7 @@
     { kind: 'PRIVATE_KEY', re: /-----BEGIN [A-Z0-9 ]*PRIVATE KEY-----[\s\S]*?-----END [A-Z0-9 ]*PRIVATE KEY-----/g },
     { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*"((?:\\.|[^"\\\r\n]){1,})"/gi, group: 1 },
     { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*'((?:\\.|[^'\\\r\n]){1,})'/gi, group: 1 },
-    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*([^\s"',;&}\]]{1,})/gi, group: 1 },
+    { kind: 'SECRET', re: /\b[\w.-]*?(?:password|passwd|pwd|secret|token|api[_-]?key)\b["']?\s*[:=]\s*(?![\s{\[])([^\s"',;&}\]]{1,})/gi, group: 1 },
     { kind: 'API_KEY', re: /\bsk-(?:ant-|proj-)?[A-Za-z0-9_-]{20,}/g },
     { kind: 'API_KEY', re: /\bgh[pousr]_[A-Za-z0-9]{30,}\b|\bgithub_pat_[A-Za-z0-9_]{40,}\b/g },
     { kind: 'API_KEY', re: /\b(?:AKIA|ASIA)[0-9A-Z]{16}\b/g },
