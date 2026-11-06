@@ -161,3 +161,42 @@ test('cleanMap accepts only tag maps with text values', () => {
   assert.equal(SP.cleanMap(null), null);
   assert.equal(SP.cleanMap(['x']), null);
 });
+
+test('quoted JSON secrets and values with spaces are completely hidden', () => {
+  const input = '{"password": "a long secret phrase", "api_key": "secret value with spaces"}';
+  const r = SP.redact(input);
+  assert.ok(!r.text.includes('long secret phrase'));
+  assert.ok(!r.text.includes('secret value with spaces'));
+  assert.equal(SP.restore(r.text, r.map).text, input);
+});
+test('redaction avoids placeholder names already present in input', () => {
+  const input = 'Keep [EMAIL_1] and [EMAIL_3]; send to a@b.co and c@d.co';
+  const r = SP.redact(input);
+  assert.equal(r.text, 'Keep [EMAIL_1] and [EMAIL_3]; send to [EMAIL_2] and [EMAIL_4]');
+  assert.equal(r.counts.EMAIL, 2);
+  assert.equal(SP.restore(r.text, r.map).text, input);
+});
+test('escaped quotes inside JSON secrets remain hidden and restore exactly', () => {
+  const input = JSON.stringify({ password: 'six "private words" inside' });
+  const redacted = SP.redact(input);
+  assert.equal(redacted.occurrences, 1);
+  assert.ok(!redacted.text.includes('private'));
+  assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+});
+
+
+test('an assignment hides its entire value even if it contains an API key', () => {
+  const input = 'password="prefix sk-abcdefghijklmnopqrstuv suffix"';
+  const redacted = SP.redact(input);
+  assert.equal(redacted.text, 'password="[SECRET_1]"');
+  assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+  assert.deepEqual(kinds(input, { enabled: { SECRET: false } }), ['API_KEY']);
+});
+
+
+test('escaped single quotes in quoted assignments stay hidden', () => {
+  const input = String.raw`password='password\' with more text'`;
+  const redacted = SP.redact(input);
+  assert.equal(redacted.text, "password='[SECRET_1]'");
+  assert.equal(SP.restore(redacted.text, redacted.map).text, input);
+});

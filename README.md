@@ -1,6 +1,6 @@
 # Shadepad
 
-A browser-only tool that hides likely secrets (API keys, passwords in config lines, private key blocks, JWTs, emails, phone numbers, IP addresses, card numbers and Korean resident IDs) before you paste text into an AI tool, and puts the original values back into the AI's reply. Static site, no server of its own, no AI API calls, no upload. 5 languages (en, ko, ja, zh, es).
+A browser-only tool that hides likely secrets (API keys, passwords in config lines, private key blocks, JWTs, emails, phone numbers, IP addresses, card numbers and Korean resident IDs) before you paste text into an AI tool, and puts the original values back into the AI's reply. The redaction tool processes text on the device and makes no AI API calls; licence verification uses a serverless endpoint and an external licensing service. 5 languages (en, ko, ja, zh, es).
 
 Working name: the folder and the product name are not final. Check trademarks (KIPRIS / USPTO / EUIPO) before launch and rename the folder and `config.js` if needed. Names of AI and other companies appear only to describe what the patterns detect, and the landing page carries a non-affiliation notice.
 
@@ -36,7 +36,7 @@ node scripts/build.js --dist
 
 ## Deploy
 
-`.github/workflows/deploy-cloudflare.yml` tests, builds and deploys this folder to a Cloudflare Pages project named `shadepad` on pushes to `main`. The project must exist first (Cloudflare dashboard → Workers & Pages → Create → Pages → Direct Upload, name `shadepad`). Then set these variables on the project (Settings → Variables and Secrets):
+`.github/workflows/deploy-cloudflare.yml` is manually started from GitHub Actions and tests, builds and deploys this folder to a Cloudflare Pages project named `shadepad` when its required repository secrets are configured. Separately configured Git-connected hosting may build or deploy on a push or merge. The project must exist first (Cloudflare dashboard → Workers & Pages → Create → Pages → Direct Upload, name `shadepad`). Then set these variables on the project (Settings → Variables and Secrets):
 
 - `LEMONSQUEEZY_PRODUCT_ID`: pins licence keys to this product.
 - `LEMONSQUEEZY_DISABLED`: set to `1` to answer `configured: false`, which keeps the app open (the state before the product is on sale).
@@ -55,3 +55,7 @@ If the server answers `configured: false`, the app opens without a key. If licen
 - Switches and custom rules are not saved between reloads, by design (only the language and licence key are stored).
 - Names are not detected (a person's name is not a pattern), and free text such as addresses is not detected.
 - Turning off a category can let its text be picked up by another category (for example digits found as a phone number when card numbers are off).
+
+## 배포 전 검증
+
+설치·빌드·브라우저 검사·Cloudflare 배포 파일 구성은 [PREDEPLOY.md](PREDEPLOY.md)를 참고하세요. `codex/predeploy-2026-11-06` 브랜치의 검증 워크플로에는 배포 단계가 없습니다.
