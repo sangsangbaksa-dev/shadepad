@@ -2,6 +2,12 @@
    Missing keys fall back to English. Brand and product names stay as they are in every language. */
 window.SP_I18N = {
   en: {
+    title_home: 'Shadepad — Hide secrets before you paste into AI',
+    title_app: 'Shadepad app',
+    title_privacy: 'Privacy — Shadepad',
+    title_terms: 'Terms — Shadepad',
+    mock_found: 'Found',
+    mock_restore: 'Restored after the answer',
     brand: 'Shadepad', set_lang: 'Language', nav_app: 'Open the app', nav_privacy: 'Privacy', nav_terms: 'Terms',
     legal_back: 'Back to Shadepad', legal_updated: 'Last updated {d}.',
     hero_title: 'Hide the secrets before you paste into an AI.',
@@ -83,6 +89,12 @@ window.SP_I18N = {
     gate_invalid: 'That key is not valid for Shadepad.', gate_refunded: 'That key has been refunded or disabled.', gate_unreachable: 'Could not reach the licence server. Try again in a moment.'
   },
   ko: {
+    title_home: 'Shadepad — AI에 붙여넣기 전에 비밀값 가리기',
+    title_app: 'Shadepad 앱',
+    title_privacy: '개인정보처리방침 — Shadepad',
+    title_terms: '이용약관 — Shadepad',
+    mock_found: '찾은 항목',
+    mock_restore: '답변 후 복원',
     brand: 'Shadepad', set_lang: '언어', nav_app: '앱 열기', nav_privacy: '개인정보', nav_terms: '약관',
     legal_back: 'Shadepad으로 돌아가기', legal_updated: '최종 수정 {d}.',
     hero_title: 'AI에 붙여넣기 전에 비밀 값을 가리세요.',
@@ -164,6 +176,12 @@ window.SP_I18N = {
     gate_invalid: '이 키는 Shadepad에서 유효하지 않습니다.', gate_refunded: '이 키는 환불되었거나 비활성화되었습니다.', gate_unreachable: '라이선스 서버에 연결할 수 없습니다. 잠시 후 다시 시도하세요.'
   },
   ja: {
+    title_home: 'Shadepad — AIに貼る前に機密を隠す',
+    title_app: 'Shadepad アプリ',
+    title_privacy: 'プライバシーポリシー — Shadepad',
+    title_terms: '利用規約 — Shadepad',
+    mock_found: '検出',
+    mock_restore: '回答後に復元',
     brand: 'Shadepad', set_lang: '言語', nav_app: 'アプリを開く', nav_privacy: 'プライバシー', nav_terms: '利用規約',
     legal_back: 'Shadepadに戻る', legal_updated: '最終更新 {d}。',
     hero_title: 'AIに貼り付ける前に、秘密の値を隠しましょう。',
@@ -245,6 +263,12 @@ window.SP_I18N = {
     gate_invalid: 'このキーはShadepadでは無効です。', gate_refunded: 'このキーは返金済みか、無効になっています。', gate_unreachable: 'ライセンスサーバーに接続できませんでした。しばらくしてから再試行してください。'
   },
   zh: {
+    title_home: 'Shadepad — 粘贴到 AI 前隐藏机密',
+    title_app: 'Shadepad 应用',
+    title_privacy: '隐私政策 — Shadepad',
+    title_terms: '使用条款 — Shadepad',
+    mock_found: '发现',
+    mock_restore: '回答后还原',
     brand: 'Shadepad', set_lang: '语言', nav_app: '打开应用', nav_privacy: '隐私', nav_terms: '条款',
     legal_back: '返回 Shadepad', legal_updated: '最后更新 {d}。',
     hero_title: '在粘贴给 AI 之前，先遮住敏感信息。',
@@ -326,6 +350,12 @@ window.SP_I18N = {
     gate_invalid: '该密钥对 Shadepad 无效。', gate_refunded: '该密钥已退款或被停用。', gate_unreachable: '无法连接许可证服务器，请稍后再试。'
   },
   es: {
+    title_home: 'Shadepad — Oculta los secretos antes de pegar en una IA',
+    title_app: 'Aplicación Shadepad',
+    title_privacy: 'Política de privacidad — Shadepad',
+    title_terms: 'Condiciones de uso — Shadepad',
+    mock_found: 'Detectado',
+    mock_restore: 'Restaurado tras la respuesta',
     brand: 'Shadepad', set_lang: 'Idioma', nav_app: 'Abrir la app', nav_privacy: 'Privacidad', nav_terms: 'Términos',
     legal_back: 'Volver a Shadepad', legal_updated: 'Última actualización {d}.',
     hero_title: 'Oculta los datos sensibles antes de pegarlos en una IA.',

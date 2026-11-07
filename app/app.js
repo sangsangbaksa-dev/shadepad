@@ -22,8 +22,8 @@
     try { localStorage.setItem(KEY, JSON.stringify({ lang: state.lang, license: state.license })); } catch (e) { /* private mode: nothing kept */ }
   }
   function detectLang() {
-    var n = ((navigator.language || 'en') + '').slice(0, 2).toLowerCase();
-    return LANGS.indexOf(n) >= 0 ? n : 'en';
+    var n = ((navigator.language || '') + '').slice(0, 2).toLowerCase();
+    return LANGS.indexOf(n) >= 0 ? n : 'ko';
   }
 
   var saved = readStore();

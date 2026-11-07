@@ -1,6 +1,6 @@
 # Shadepad
 
-A browser-only tool that hides likely secrets (API keys, passwords in config lines, private key blocks, JWTs, emails, phone numbers, IP addresses, card numbers and Korean resident IDs) before you paste text into an AI tool, and puts the original values back into the AI's reply. Static site, no server of its own, no upload. An optional AI check sends only the hidden text, with your own API key, and only when you press its button. 5 languages (en, ko, ja, zh, es).
+A browser-only tool that hides likely secrets (API keys, passwords in config lines, private key blocks, JWTs, emails, phone numbers, IP addresses, card numbers and Korean resident IDs) before you paste text into an AI tool, and puts the original values back into the AI's reply. Static site, no server of its own, no upload. An optional AI check sends only the hidden text, with your own API key, and only when you press its button. 5 languages (ko default, en, ja, zh, es). The language follows the browser when it is one of the five, and the choice is saved in `localStorage` (`shadepad.v1`).
 
 Working name: the folder and the product name are not final. Check trademarks (KIPRIS / USPTO / EUIPO) before launch and rename the folder and `config.js` if needed. Names of AI and other companies appear only to describe what the patterns detect, and the landing page carries a non-affiliation notice.
 
@@ -80,3 +80,9 @@ If the server answers `configured: false`, the app opens without a key. If licen
 - Switches and custom rules are not saved between reloads, by design (only the language and licence key are stored).
 - Names are not detected (a person's name is not a pattern), and free text such as addresses is not detected.
 - Turning off a category can let its text be picked up by another category (for example digits found as a phone number when card numbers are off).
+
+## Translations and review status
+
+Five languages are in `i18n.js`: Korean (default), English, Japanese, Chinese (Simplified) and Spanish. `test/i18n.test.js` fails if any key is missing, empty or has different placeholders in any language, or if a page or script asks for a key the dictionary does not define.
+
+Privacy and terms wording, the non-affiliation line and the price line are reviewed by native speaker: no, in `en`, `ja`, `es` and `zh`. Korean wording is not checked by a lawyer either. Treat the legal pages as drafts until they have been reviewed.
