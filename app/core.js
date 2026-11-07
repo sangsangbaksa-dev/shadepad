@@ -105,6 +105,7 @@
     var enabled = (opts && opts.enabled) || {};
     var custom = (opts && opts.custom) || [];
     var rules = RULES.concat(custom).filter(function (r) { return enabled[r.kind] !== false; });
+    var allow = (opts && opts.allow) || [];
     /* used[i] marks a character already claimed by an earlier match. Linear in the text length,
        unlike comparing each match with every earlier one (which is quadratic on large logs). */
     var used = new Uint8Array(src.length), out = [];
@@ -112,6 +113,7 @@
       var hits = rule.scan ? rule.scan(src) : regexHits(rule, src);
       hits.forEach(function (h) {
         if (rule.check && !rule.check(h.value)) return;
+        if (allow.indexOf(h.value) !== -1) return;
         for (var p = h.start; p < h.end; p++) { if (used[p]) return; }
         for (p = h.start; p < h.end; p++) used[p] = 1;
         out.push({ kind: rule.kind, value: h.value, start: h.start, end: h.end });
@@ -178,6 +180,18 @@
   /* Turns the custom rule text (one literal text per line) into rules.
      Returns { rules: [{ kind: 'CUSTOM', re }], errors: [line numbers] }.
      Lines that are too long or beyond the limit are reported, not used. */
+  /* Values the user says are not secret (one per line). Exact, case-sensitive matches; trimmed, de-duplicated,
+     at most 50 entries of 200 characters. Returns { values, dropped }. */
+  function cleanAllow(text) {
+    var lines = String(text == null ? '' : text).split(/\r?\n/), values = [], dropped = 0;
+    lines.forEach(function (raw) {
+      var v = raw.trim();
+      if (!v) return;
+      if (v.length > 200 || values.length >= 50 || values.indexOf(v) !== -1) { dropped++; return; }
+      values.push(v);
+    });
+    return { values: values, dropped: dropped };
+  }
   function compileCustom(text) {
     var lines = String(text == null ? '' : text).split(/\r?\n/);
     var rules = [], errors = [];
@@ -330,7 +344,7 @@
 
   var SP = {
     findAll: findAll, redact: redact, restore: restore, preview: preview, luhn: luhn,
-    KINDS: KINDS, compileCustom: compileCustom, cleanMap: cleanMap,
+    KINDS: KINDS, compileCustom: compileCustom, cleanAllow: cleanAllow, cleanMap: cleanMap,
     AI: AI, sanitizeForPrompt: sanitizeForPrompt, checkPrompt: checkPrompt, requestBody: requestBody,
     replyText: replyText, parseCheckReply: parseCheckReply, localCheck: localCheck
   };

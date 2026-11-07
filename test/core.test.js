@@ -161,3 +161,29 @@ test('cleanMap accepts only tag maps with text values', () => {
   assert.equal(SP.cleanMap(null), null);
   assert.equal(SP.cleanMap(['x']), null);
 });
+
+test('allow list keeps exact values unhidden; other matches still hidden', () => {
+  const text = 'write to ops@example.com or dev@acme.io, server 10.0.0.1';
+  const all = SP.findAll(text, {}).map((f) => f.value);
+  assert.ok(all.includes('ops@example.com') && all.includes('dev@acme.io'));
+  const kept = SP.findAll(text, { allow: ['ops@example.com'] }).map((f) => f.value);
+  assert.ok(!kept.includes('ops@example.com'));
+  assert.ok(kept.includes('dev@acme.io'));
+  const r = SP.redact(text, { allow: ['ops@example.com'] });
+  assert.ok(r.text.includes('ops@example.com'));
+  assert.ok(!r.text.includes('dev@acme.io'));
+});
+test('allow list is exact and case-sensitive', () => {
+  const kept = SP.findAll('Ops@Example.com', { allow: ['ops@example.com'] }).map((f) => f.value);
+  assert.deepEqual(kept, ['Ops@Example.com']);
+});
+test('cleanAllow: trims, drops blanks and duplicates, caps length and count', () => {
+  assert.deepEqual(SP.cleanAllow(' a \n\n a\r\nb\n'), { values: ['a', 'b'], dropped: 1 });
+  const long = 'x'.repeat(201);
+  assert.deepEqual(SP.cleanAllow(long + '\nok'), { values: ['ok'], dropped: 1 });
+  const many = Array.from({ length: 55 }, (_, i) => 'v' + i).join('\n');
+  const r = SP.cleanAllow(many);
+  assert.equal(r.values.length, 50);
+  assert.equal(r.dropped, 5);
+  assert.deepEqual(SP.cleanAllow(null), { values: [], dropped: 0 });
+});

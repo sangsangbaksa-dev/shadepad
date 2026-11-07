@@ -224,7 +224,7 @@
   $('input').addEventListener('input', updateStale);
 
   /* Ctrl+Enter (Cmd+Enter on Mac) hides details from either text box, and restores from the AI reply box. */
-  ['input', 'custom'].forEach(function (id) {
+  ['input', 'custom', 'allow'].forEach(function (id) {
     $(id).addEventListener('keydown', function (e) {
       if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) { e.preventDefault(); $('redact').click(); }
     });
@@ -242,7 +242,7 @@
     }
     setMsg('custom_msg', null);
     var source = $('input').value;
-    var r = SP.redact(source, { enabled: detect, custom: custom.rules });
+    var r = SP.redact(source, { enabled: detect, custom: custom.rules, allow: SP.cleanAllow($('allow').value).values });
     r.source = source;
     last = r;
     $('output').value = r.text;
